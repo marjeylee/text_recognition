@@ -18,7 +18,7 @@ __author__ = 'li'
 
 if __name__ == '__main__':
     # path = 'F:\dataset\container_dataset/text_area_vertical'
-    path = 'F:\dataset\container_dataset/text_area_horizontal'
+    path = 'E:\dataset/text_area/vertical'
     paths = get_all_file_from_dir(path)
     for p in paths:
         os.remove(p)

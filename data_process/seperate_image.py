@@ -20,9 +20,9 @@ __author__ = 'li'
 """
 把不同形状的训练集做区分：水平的和垂直的。
 """
-ORIGINAL_PATH = 'F:\dataset/text_area_2018-9-9/'
-HORIZONTAL_PATH = 'F:\dataset\horizontal/'
-VERTICAL_PATH = 'F:\dataset/vertical/'
+ORIGINAL_PATH = 'E:\dataset/text_area/text_area/'
+HORIZONTAL_PATH = 'E:\dataset/text_area\horizontal/'
+VERTICAL_PATH = 'E:\dataset/text_area/vertical/'
 
 all_image_path = get_all_file_from_dir(ORIGINAL_PATH)
 for path in all_image_path:

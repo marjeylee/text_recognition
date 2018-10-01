@@ -112,40 +112,33 @@ def train_shadownet(dataset_dir, weights_path=None):
         threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
         for epoch in range(train_epochs):
-            training_img, training_label = get_training_data()
-            feed_dict = {inputdata: training_img, input_labels: training_label}
-            _, c, seq_distance, preds, gt_labels, summary = sess.run(
-                [optimizer, cost, sequence_dist, decoded, input_labels, merge_summary_op], feed_dict=feed_dict)
-            # calculate the precision
-            accuracy = []
-            for index, gt_label in enumerate(gt_labels):
-                pred = preds[index]
-                totol_count = len(gt_label)
-                correct_count = 0
-                try:
-                    for i, tmp in enumerate(gt_label):
-                        if tmp == pred[i]:
-                            correct_count += 1
-                except IndexError:
-                    continue
-                finally:
-                    try:
-                        accuracy.append(correct_count / totol_count)
-                    except ZeroDivisionError:
-                        if len(pred) == 0:
-                            accuracy.append(1)
-                        else:
-                            accuracy.append(0)
-            accuracy = np.mean(np.array(accuracy).astype(np.float32), axis=0)
-            #
-            if epoch % config.cfg.TRAIN.DISPLAY_STEP == 0:
-                logger.info('Epoch: {:d} cost= {:9f} seq distance= {:9f} train accuracy= {:9f}'.format(
-                    epoch + 1, c, seq_distance, accuracy))
-            if epoch % 1000 == 0 and epoch != 0:
-                summary_writer.add_summary(summary=summary, global_step=epoch)
-                saver.save(sess=sess, save_path=model_save_path, global_step=epoch)
-                logger.info('save_model!!!!!!!!!!!!!!!!!!!___________________')
+            try:
+                training_img, training_label = get_training_data()
+                feed_dict = {inputdata: training_img, input_labels: training_label}
+                _, c, seq_distance, preds, gt_labels, summary = sess.run(
+                    [optimizer, cost, sequence_dist, decoded, input_labels, merge_summary_op], feed_dict=feed_dict)
+                # calculate the precision
+                preds_sequence = preds[0].values.tolist()
+                gt_value = gt_labels.values.tolist()
+                pre_count = len(preds_sequence)
+                accu_num = 0
+                gt_count = len(gt_value)
+                for index in range(gt_count):
+                    if index < pre_count:
+                        if gt_value[index] is not None and preds_sequence[index] is not None:
+                            if gt_value[index] == preds_sequence[index]:
+                                accu_num += 1
+                accuracy = accu_num * 1.0 / pre_count
 
+                if epoch % config.cfg.TRAIN.DISPLAY_STEP == 0:
+                    logger.info('Epoch: {:d} cost= {:9f} seq distance= {:9f} train accuracy= {:9f}'.format(
+                        epoch + 1, c, seq_distance, accuracy))
+                if epoch % 1000 == 0 and epoch != 0:
+                    summary_writer.add_summary(summary=summary, global_step=epoch)
+                    saver.save(sess=sess, save_path=model_save_path, global_step=epoch)
+                    logger.info('save_model!!!!!!!!!!!!!!!!!!!___________________')
+            except Exception as e:
+                print(e)
         coord.request_stop()
         coord.join(threads=threads)
     sess.close()
@@ -159,5 +152,8 @@ if __name__ == '__main__':
     # if not ops.exists(args.dataset_dir):
     #     raise ValueError('{:s} doesn\'t exist'.format(args.dataset_dir))
     # /gpu_data/code/text_recognition/model/shadownet/shadownet_2018-08-03-20-50-16.ckpt-6000
-    train_shadownet('./save_dir', None)
+    # train_shadownet('./save_dir',
+    #                 None)
+    train_shadownet('./save_dir',
+                    '/gpu_data/back/code/vertical_text_recognition/model/shadownet/shadownet_2018-10-01-11-20-26.ckpt-29000')
     print('Done')

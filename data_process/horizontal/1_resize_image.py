@@ -21,7 +21,7 @@ __author__ = 'li'
 """
 讲图片格式化为32高，100宽的大小
 """
-HORIZONTAL_PATH = 'F:\dataset\horizontal/'
+HORIZONTAL_PATH = 'E:\dataset/text_area\horizontal/'
 
 
 def get_resize_image(path):
@@ -46,9 +46,14 @@ def get_resize_image(path):
 
 def main():
     all_image_path = get_all_file_from_dir(HORIZONTAL_PATH)
+    length = len(all_image_path)
+    index = 0
     for path in all_image_path:
+        index += 1
+        if index % 100 == 0:
+            print(str(index * 1.0 / length))
         new_img = get_resize_image(path)
-        print(path)
+        # print(path)
         save_img(new_img, path)
 
 
